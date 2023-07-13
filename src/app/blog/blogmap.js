@@ -3,15 +3,24 @@
 import maplibregl from 'maplibre-gl'; 
 import {useEffect} from 'react';
 
+function getbbox(coordinates) { // Can replace with a turfjs call
+  const lons = coordinates.map(v => v[0]);
+  const lats = coordinates.map(v => v[1]);
+  let [w, e] = [Math.min(...lons), Math.max(...lons)];
+  let [s, n] = [Math.min(...lats), Math.max(...lats)];
+  return [w,s,e,n];
+}
+
 export default function BlogMap({id, route}) {
   const mapId = `${id}-map`;
+  
+  const bbox = getbbox(route.coordinates);
 
   useEffect(() => {
     const map = new maplibregl.Map({
       container: mapId,
       style: process.env.NEXT_PUBLIC_MAPTILER_URL, // CRITICAL! CHANGE HOW STORED
-      center: [-74.5, 40],                         // BEFORE SENDING TO PRODUCTION
-      zoom: 4
+      bounds: bbox,                                // BEFORE SENDING TO PRODUCTION
     });  
 
     map.on('load', function () {
@@ -19,10 +28,7 @@ export default function BlogMap({id, route}) {
         "type": "geojson",
         "data": {
           "type": "Feature",
-          "geometry": {
-            "type": "LineString",
-            "coordinates": route
-          },
+          "geometry": route,
         }
       });
       map.addLayer({
@@ -44,6 +50,8 @@ export default function BlogMap({id, route}) {
         }
       },`${id}-route`);
     });
+
+    map.fitBounds(bbox, {padding: {top: 25, bottom: 25, left: 25, right: 25}});
   });
 
   return (
