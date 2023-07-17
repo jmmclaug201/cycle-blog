@@ -24,6 +24,7 @@ export default function BlogMap({id, route}) {
     });  
 
     map.on('load', function () {
+      console.log("JFIFJI")
       map.addSource(`${id}-route`, {
         "type": "geojson",
         "data": {
