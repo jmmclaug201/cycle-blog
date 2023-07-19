@@ -1,28 +1,23 @@
 'use client'
 
+import bbox from "@turf/bbox"
+
 import maplibregl from 'maplibre-gl'; 
 import {useEffect, useRef} from 'react';
-
-function getbbox(coordinates) { // Can replace with a turfjs call
-  const lons = coordinates.map(v => v[0]);
-  const lats = coordinates.map(v => v[1]);
-  let [w, e] = [Math.min(...lons), Math.max(...lons)];
-  let [s, n] = [Math.min(...lats), Math.max(...lats)];
-  return [w,s,e,n];
-}
 
 export default function BlogMap({id, route, highlight}) {
   const mapId = `${id}-map`;
   
-  const bbox = getbbox(route.coordinates);
+  const routeBbox = bbox(route);
 
   const map = useRef(undefined);
   useEffect(() => {
+    // If we haven't already defined the map define and load it
     if (map.current === undefined) {
       const m = new maplibregl.Map({
         container: mapId,
         style: process.env.NEXT_PUBLIC_MAPTILER_URL, // CRITICAL! CHANGE HOW STORED
-        bounds: bbox,                                // BEFORE SENDING TO PRODUCTION
+        bounds: routeBbox,                           // BEFORE SENDING TO PRODUCTION
       });  
 
       m.on('load', function () {
@@ -53,15 +48,17 @@ export default function BlogMap({id, route, highlight}) {
         },`${id}-route`);
       });
 
-      m.fitBounds(bbox, {padding: {top: 25, bottom: 25, left: 25, right: 25}});
+      m.fitBounds(routeBbox, {padding: {top: 25, bottom: 25, left: 25, right: 25}});
       map.current = m;
     }
+    // Remove Highlight from Previous Render
     if (map.current.getLayer(`${id}-route-highlight`)) {
       map.current.removeLayer(`${id}-route-highlight`);
     }
     if (map.current.getSource(`${id}-route-highlight`)) {
       map.current.removeSource(`${id}-route-highlight`);
     }
+    // Add Highlight for This Render, if Applicable
     if (highlight !== undefined) {
       map.current.addSource(`${id}-route-highlight`, {
         "type": "geojson",

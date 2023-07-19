@@ -1,6 +1,7 @@
 import {redirect} from "next/navigation.js"
 
 import lineSliceAlong from "@turf/line-slice-along"
+import {marked} from "marked";
 
 import {readTour} from "lib/db.js"
 import ClientPage from "./clientpage.js"
@@ -24,6 +25,11 @@ export default async function Page({params}) {
       lineSliceAlong(tour.route, section.start, section.end, {units: 'miles'}) :
       undefined)
   );
+
+  // Precompute markdown for each text section
+  for(const section of tour.post) {
+    section.text = marked.parse(section.text);
+  }
   
   return (
     <ClientPage tour={tour} lineSlices={lineSlices}/>

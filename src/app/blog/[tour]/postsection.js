@@ -2,8 +2,13 @@
 
 export default function PostSection({text, onHover, onLeave}) {
   return (
-    <div onMouseOver={() => {console.log("Hovered"); onHover()}} onMouseOut={onLeave}>
-      {text}
-    </div>
+    <>
+        <div className="hover:bg-slate-200" 
+          onMouseOver={() => {console.log("Hovered"); onHover()}}
+          onMouseOut={onLeave}
+          dangerouslySetInnerHTML = {{__html: text}}>
+      </div>
+      <br></br>
+    </>
   );
 }
