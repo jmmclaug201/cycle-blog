@@ -11,18 +11,18 @@ export default function ClientPage({tour, lineSlices}) {
   return (
     <div className="flex">
       <div className="basis-1/2 h-screen">
-        <BlogMap id={"tourMap"} route={tour.route} highlight={focus}/>
+        <BlogMap id={"tourMap"} route={tour.route} lineSlices={lineSlices} highlight={focus}/>
       </div>
-      <div className="basis-1/2 p-8">
+      <div className="basis-1/2 p-8 h-screen overflow-y-scroll">
         <h2 className="text-3xl">
           {tour.title}
         </h2>
-        <div className="text-sm">
+        <div className="text-md">
           {tour.post.map((section, index) => (
-            <PostSection 
+            <PostSection
               key={index} 
               text={section.text}
-              onHover = {() => setFocus(lineSlices[index])}
+              onHover = {() => setFocus(index)}
               onLeave = {() => setFocus(undefined)}/>
           ))}
         </div>

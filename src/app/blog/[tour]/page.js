@@ -16,7 +16,7 @@ export default async function Page({params}) {
     // Note to self: somehow i should delete tour._id;
   } catch(error) {
     console.dir(error);
-    redirect("/blog")
+    redirect("/")
   }
 
   // Precompute different line slices for each highlight
